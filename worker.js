@@ -1,6 +1,15 @@
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname === "/logo") {
+      const obj = await env.cwl.get("Christopher Wren 4855.jpeg");
+      if (!obj) return new Response("Not found", { status: 404 });
+      const headers = new Headers();
+      obj.writeHttpMetadata(headers);
+      headers.set("Cache-Control", "public, max-age=86400");
+      headers.set("Content-Type", "image/jpeg");
+      return new Response(obj.body, { headers });
+    }
     if (url.hostname === "christopherwrenlodge.co.uk") {
       url.hostname = "www.christopherwrenlodge.co.uk";
       return Response.redirect(url.toString(), 301);
@@ -20,7 +29,7 @@ export default {
   </style>
 </head>
 <body>
-  <img src="https://pub-6992575a52e041d088b3485e58c98381.r2.dev/Christopher%20Wren%204855.jpeg" alt="Christopher Wren Lodge" class="logo" />
+  <img src="/logo" alt="Christopher Wren Lodge" class="logo" />
   <h1>Christopher Wren Lodge</h1>
   <p>Our website is on its way. Please check back soon.</p>
 </body>
